@@ -103,7 +103,7 @@ function processHttpRequest($method, $uri, $headers, $body) {
             }
         } catch (error) {
             console.log(error);
-            outputHttpResponse(500, 'File not found', $headers, 'File not found');
+            outputHttpResponse(500, 'Internal Server Error', $headers, 'Internal Server Error');
         }
     }
 

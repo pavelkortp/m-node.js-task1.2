@@ -1,8 +1,0 @@
-`HTTP/1.1 ${statusCode} ${statusMessage} \n`+
-        `Date: ${new Date()}\n`+
-        `Server: Apache/2.2.14 (Win32)\n`+
-        `Connection: Closed\n`+
-        `Content-Type: text/html; charset=utf-8\n`+
-        `Content-Length: ${(body + '').length}\n`+
-        
-        `\n${body}`
