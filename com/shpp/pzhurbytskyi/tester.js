@@ -69,9 +69,9 @@ Content-Length: 2
 
     4: `HTTP/1.1 200 OK
 Server: Apache/2.2.14 (Win32)
-Content-Length: 34
 Connection: Closed
-Content-Type: text/html; charset=utf-8
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 34
 
 <h1 style="color:green">FOUND</h1>`,
     5: `please do it yourself`, 

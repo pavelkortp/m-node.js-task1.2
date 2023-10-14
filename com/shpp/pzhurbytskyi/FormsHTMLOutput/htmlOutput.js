@@ -54,14 +54,15 @@ function parseTcpStringAsHttpRequest(string) {
  */
 function outputHttpResponse(statusCode, statusMessage, headers, body) {
     console.log(
-        `HTTP/1.1 ${statusCode} ${statusMessage}
-Date: ${new Date()}
-Server: Apache/2.2.14 (Win32)
-Connection: Closed
-Content-Type: text/html; charset=utf-8
-Content-Length: ${(body + '').length}
+        `HTTP/1.1 ${statusCode} ${statusMessage} \n` +
+        `Date: ${new Date()}\n` +
+        `Server: Apache/2.2.14 (Win32)\n` +
+        `Connection: Closed\n` +
+        `Content-Type: ${headers['Content-Type']}\n` +
+        `Content-Length: ${(body + '').length}\n` +
 
-${body}`);
+        `\n${body}`
+    );
 }
 
 /**
@@ -72,20 +73,38 @@ ${body}`);
  * @param {string} $body request body.
  */
 function processHttpRequest($method, $uri, $headers, $body) {
-    if ($method === 'GET' && $uri.startsWith('/sum?nums=')) {
-        const sum = $uri
-            .substring($uri.indexOf('=') + 1)
-            .split(',')
-            .map(e => Number.parseInt(e))
-            .reduce((s, e) => {
-                s += e;
-                return s;
-            }, 0);
-        outputHttpResponse(200, 'OK', $headers, sum);
-    } else if (!$uri.startsWith('/sum')) {
-        outputHttpResponse(404, 'Not found', $headers, 'not found');
-    } else if ($method !== 'GET' || !$uri.includes('?nums=')) {
-        outputHttpResponse(400, 'Bad Request', $headers, 'bad request');
+    if ($uri !== '/api/checkLoginAndPassword' ||
+        $headers['Content-Type'] !== 'application/x-www-form-urlencoded' ||
+        $method !== 'POST') {
+        outputHttpResponse(400, 'Bad Request', $headers, $body);
+    } else {
+        const requestedData = $body
+            .split('&')
+            .reduce((user, e) => {
+                const entryName = e.split('=')[0];
+                const entryVal = e.split('=')[1];
+                user[entryName] = entryVal;
+                return user;
+            }, {});
+        try {
+
+            const userData = require('fs')
+                .readFileSync('E:/learning node.js/school_shpp/level1/task1.2/com/shpp/pzhurbytskyi/FormsHTMLOutput/passwords.txt', 'utf8')
+                .split('\n')
+                .filter(e => e !== '')
+                .find(e => {
+                    const [login, pass] = e.split(':');
+                    return login === requestedData.login && pass === requestedData.password;
+                });
+            if (userData !== undefined) {
+                outputHttpResponse(200, 'OK', $headers, '<h1 style="color:green">FOUND</h1>');
+            } else {
+                outputHttpResponse(200, 'OK', $headers, '<h1 style="color:red">NOT FOUND</h1>');
+            }
+        } catch (error) {
+            console.log(error);
+            outputHttpResponse(500, 'File not found', $headers, 'File not found');
+        }
     }
 
 }
